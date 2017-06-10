@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "DebugOverlay.hpp"
 #include "spaceship.hpp"
 #include "LTimer.hpp"
 
@@ -26,6 +27,8 @@ int main(int argc, char ** argv)
 
     // for this to work, i will assume you already have a SDL_Renderer and a SDL_Window.
     SDL_Texture * texture = IMG_LoadTexture(renderer, "assets/1.png");
+
+    DebugOverlay * overlay = new DebugOverlay();
 
     Spaceship * ship = new Spaceship(texture);
 
@@ -59,7 +62,10 @@ int main(int argc, char ** argv)
         // Clear the entire screen to our selected color.
         SDL_RenderClear(renderer);
 
+        overlay->print("Hello World!");
+
         ship->render(renderer);
+        overlay->render(renderer);
 
         SDL_RenderPresent(renderer);
 
