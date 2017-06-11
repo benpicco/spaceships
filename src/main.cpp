@@ -7,25 +7,6 @@
 
 #define JOYSTICK_DEAD_ZONE
 
-static float getFps2(void) {
-    float alpha = 0.2;  // Change at will. Lower means smoother, but higher values respond faster.
-    static int frametimelast = 1;
-    static float frametime = 1;
-    int getticks, frametimedelta;
-    float framespersecond;
-
-    getticks = SDL_GetTicks();
-    frametimedelta = getticks - frametimelast;
-    frametimelast = getticks;
-
-    // This is the important part:
-    frametime = alpha * frametimedelta + (1.0 - alpha) * frametime;
-
-    framespersecond = 1000.0 / frametime;
-
-    return framespersecond;
-}
-
 static float getFrameMs(void) {
     static int ticks_old = 0;
 
@@ -58,7 +39,7 @@ int main(int argc, char ** argv)
 
     DebugOverlay * overlay = new DebugOverlay();
 
-    Spaceship * ship = new Spaceship(texture);
+    Spaceship * ship = new Spaceship(texture, 100, 10000);
 
     LTimer stepTimer;
 
@@ -79,6 +60,8 @@ int main(int argc, char ** argv)
  
         //Calculate time step
         float timeStep = stepTimer.getTicks() / 1000.f;
+
+        ship->updatePhysics();
 
         //Move for time step
         ship->move(timeStep);
