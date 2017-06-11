@@ -7,6 +7,34 @@
 
 #define JOYSTICK_DEAD_ZONE
 
+static float getFps2(void) {
+    float alpha = 0.2;  // Change at will. Lower means smoother, but higher values respond faster.
+    static int frametimelast = 1;
+    static float frametime = 1;
+    int getticks, frametimedelta;
+    float framespersecond;
+
+    getticks = SDL_GetTicks();
+    frametimedelta = getticks - frametimelast;
+    frametimelast = getticks;
+
+    // This is the important part:
+    frametime = alpha * frametimedelta + (1.0 - alpha) * frametime;
+
+    framespersecond = 1000.0 / frametime;
+
+    return framespersecond;
+}
+
+static float getFrameMs(void) {
+    static int ticks_old = 0;
+
+    int ret = SDL_GetTicks() - ticks_old;
+    ticks_old = SDL_GetTicks();
+
+    return ret;
+}
+
 int main(int argc, char ** argv)
 {
     bool quit = false;
@@ -36,6 +64,8 @@ int main(int argc, char ** argv)
 
     while (!quit)
     {
+        overlay->print("FPS: %.1f", getFrameMs());
+
         while (SDL_PollEvent(&event)) {
             switch (event.type)
             {
@@ -62,8 +92,7 @@ int main(int argc, char ** argv)
         // Clear the entire screen to our selected color.
         SDL_RenderClear(renderer);
 
-        overlay->print("Hello World!");
-
+        ship->printDiagnostics(overlay);
         ship->render(renderer);
         overlay->render(renderer);
 

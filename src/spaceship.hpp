@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include "DebugOverlay.hpp"
 
 class Spaceship {
 	float mPosX, mPosY;
@@ -25,4 +26,6 @@ public:
 
 	//Shows the dot on the screen
 	void render(SDL_Renderer * renderer);
+
+	void printDiagnostics(DebugOverlay * overlay);
 };

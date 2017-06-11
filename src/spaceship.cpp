@@ -11,7 +11,7 @@ Spaceship::Spaceship(SDL_Texture *texture) {
 
     SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 
-    angle = 180.0f;
+    angle = 0;
     center = {width/2, height/2}; // the center where the texture will be rotated.
 }
 
@@ -94,4 +94,9 @@ void Spaceship::render(SDL_Renderer * renderer) {
     SDL_Rect rect = {(int) mPosX, (int) mPosY, width, height};
 
     SDL_RenderCopyEx(renderer, texture, NULL , &rect, angle, &center, SDL_FLIP_NONE);
+}
+
+void Spaceship::printDiagnostics(DebugOverlay *overlay) {
+    overlay->print("x: %.2f", mPosX);
+    overlay->print("y: %.2f", mPosY);
 }
