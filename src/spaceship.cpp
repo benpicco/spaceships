@@ -1,13 +1,9 @@
 #include "spaceship.hpp"
 #include "math_helper.hpp"
 
-Spaceship::Spaceship(SDL_Texture *texture, float weight, float force_max) {
+SpaceObject::SpaceObject(float x, float y, SDL_Texture *texture, float weight) : mPosX(x), mPosY(y) {
     this->texture = texture;
-    this->force_max = force_max;
     this->weight = weight;
-
-    mPosX = 200;
-    mPosY = 100;
 
     mVelX = 0;
     mVelY = 0;
@@ -15,15 +11,46 @@ Spaceship::Spaceship(SDL_Texture *texture, float weight, float force_max) {
     mAccX = 0;
     mAccY = 0;
 
-    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-
     angle = 0;
     force = 0;
-    center = {width/2, height/2}; // the center where the texture will be rotated.
+
+    if (!texture)
+        printf("can't load texture!\n");
+
+    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 }
 
-Spaceship::~Spaceship(void) {
+SpaceObject::~SpaceObject(void) {
     SDL_DestroyTexture(texture);
+}
+
+void SpaceObject::updatePhysics(void) {
+    mAccX = force * sinf(deg_to_rad(angle)) / weight;
+    mAccY = -force * cosf(deg_to_rad(angle)) / weight;
+}
+
+void SpaceObject::move(float timeStep) {
+    mVelX += mAccX * timeStep;
+    mVelY += mAccY * timeStep;
+
+    mPosX += mVelX * timeStep;  
+    mPosY += mVelY * timeStep;
+}
+
+void SpaceObject::render(SDL_Renderer * renderer) {
+    SDL_Rect rect = {(int) mPosX - width / 2, (int) mPosY - height / 2, width, height};
+    SDL_Point center = {width/2, height/2}; // the center where the texture will be rotated.
+
+    SDL_RenderCopyEx(renderer, texture, NULL , &rect, angle, &center, SDL_FLIP_NONE);
+}
+
+void SpaceObject::printDiagnostics(DebugOverlay *overlay) {
+    overlay->print("x: %.2f", mPosX);
+    overlay->print("y: %.2f", mPosY);
+}
+
+Spaceship::Spaceship(float x, float y, SDL_Texture *texture, float weight, float force_max) : SpaceObject(x, y, texture, weight) {
+    this->force_max = force_max;
 }
 
 void Spaceship::handleEvent(SDL_Event& e) {
@@ -61,28 +88,4 @@ void Spaceship::handleEvent(SDL_Event& e) {
 
             break;
     }
-}
-
-void Spaceship::updatePhysics(void) {
-    mAccX = force * sinf(deg_to_rad(angle)) / weight;
-    mAccY = -force * cosf(deg_to_rad(angle)) / weight;
-}
-
-void Spaceship::move(float timeStep) {
-    mVelX += mAccX * timeStep;
-    mVelY += mAccY * timeStep;
-
-    mPosX += mVelX * timeStep;  
-    mPosY += mVelY * timeStep;
-}
-
-void Spaceship::render(SDL_Renderer * renderer) {
-    SDL_Rect rect = {(int) mPosX, (int) mPosY, width, height};
-
-    SDL_RenderCopyEx(renderer, texture, NULL , &rect, angle, &center, SDL_FLIP_NONE);
-}
-
-void Spaceship::printDiagnostics(DebugOverlay *overlay) {
-    overlay->print("x: %.2f", mPosX);
-    overlay->print("y: %.2f", mPosY);
 }

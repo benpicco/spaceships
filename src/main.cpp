@@ -24,7 +24,7 @@ int main(int argc, char ** argv)
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     IMG_Init(IMG_INIT_PNG);
  
-    SDL_Window * window = SDL_CreateWindow("SDL2 Sprite Sheets", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
+    SDL_Window * window = SDL_CreateWindow("Spaceships", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 768, 0);
     SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
     SDL_JoystickEventState(SDL_ENABLE);
@@ -34,18 +34,17 @@ int main(int argc, char ** argv)
         printf("opened joystick\n");
     }
 
-    // for this to work, i will assume you already have a SDL_Renderer and a SDL_Window.
-    SDL_Texture * texture = IMG_LoadTexture(renderer, "assets/1.png");
-
     DebugOverlay * overlay = new DebugOverlay();
 
-    Spaceship * ship = new Spaceship(texture, 100, 10000);
+    Spaceship * ship = new Spaceship(100, 100, IMG_LoadTexture(renderer, "assets/1.png"), 100, 10000);
+
+    SpaceObject * planet = new SpaceObject(600, 600, IMG_LoadTexture(renderer, "assets/planet.png"), 100000);
 
     LTimer stepTimer;
 
     while (!quit)
     {
-        overlay->print("FPS: %.1f", getFrameMs());
+        overlay->print("%.1f ms", getFrameMs());
 
         while (SDL_PollEvent(&event)) {
             switch (event.type)
@@ -76,7 +75,10 @@ int main(int argc, char ** argv)
         SDL_RenderClear(renderer);
 
         ship->printDiagnostics(overlay);
+
+        planet->render(renderer);
         ship->render(renderer);
+
         overlay->render(renderer);
 
         SDL_RenderPresent(renderer);
