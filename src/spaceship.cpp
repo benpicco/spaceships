@@ -1,6 +1,8 @@
 #include "spaceship.hpp"
 #include "math_helper.hpp"
 
+static const float M_G = 0.00000000667408;
+
 SpaceObject::SpaceObject(float x, float y, SDL_Texture *texture, float weight) : mPosX(x), mPosY(y) {
     this->texture = texture;
     this->weight = weight;
@@ -24,9 +26,30 @@ SpaceObject::~SpaceObject(void) {
     SDL_DestroyTexture(texture);
 }
 
-void SpaceObject::updatePhysics(void) {
+float SpaceObject::getMass(void) {
+    return weight;
+}
+
+SDL_Point SpaceObject::getPos(void) {
+    SDL_Point ret = {(int) mPosX, (int) mPosY};
+    return ret;
+}
+
+void SpaceObject::updatePhysics(std::vector<SpaceObject*> &v) {
     mAccX = force * sinf(deg_to_rad(angle)) / weight;
     mAccY = -force * cosf(deg_to_rad(angle)) / weight;
+
+    for (auto &o : v) {
+        if (o == this)
+            continue;
+
+        SDL_Point p = o->getPos();
+        float distance_2 = powf(p.x - mPosX, 2) + powf(p.y - mPosY, 2);
+        float F_g = M_G * weight * o->getMass() / distance_2;
+
+        mAccX += F_g * (p.x - mPosX) / (weight * sqrtf(distance_2));
+        mAccY += F_g * (p.y - mPosY) / (weight * sqrtf(distance_2));
+    }
 }
 
 void SpaceObject::move(float timeStep) {

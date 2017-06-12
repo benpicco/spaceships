@@ -1,9 +1,13 @@
+#include <vector>
+
 #include <SDL.h>
 #include <SDL_image.h>
 
 #include "DebugOverlay.hpp"
 #include "spaceship.hpp"
 #include "LTimer.hpp"
+
+using namespace std;
 
 #define JOYSTICK_DEAD_ZONE
 
@@ -36,9 +40,13 @@ int main(int argc, char ** argv)
 
     DebugOverlay * overlay = new DebugOverlay();
 
+    vector<SpaceObject*> spaceObjects;
+
+    spaceObjects.push_back(new SpaceObject(600, 600, IMG_LoadTexture(renderer, "assets/planet.png"), 1000000000000000));
+
     Spaceship * ship = new Spaceship(100, 100, IMG_LoadTexture(renderer, "assets/1.png"), 100, 10000);
 
-    SpaceObject * planet = new SpaceObject(600, 600, IMG_LoadTexture(renderer, "assets/planet.png"), 100000);
+    spaceObjects.push_back(ship);
 
     LTimer stepTimer;
 
@@ -47,8 +55,7 @@ int main(int argc, char ** argv)
         overlay->print("%.1f ms", getFrameMs());
 
         while (SDL_PollEvent(&event)) {
-            switch (event.type)
-            {
+            switch (event.type) {
                 case SDL_QUIT:
                     quit = true;
                     break;
@@ -60,12 +67,11 @@ int main(int argc, char ** argv)
         //Calculate time step
         float timeStep = stepTimer.getTicks() / 1000.f;
 
-        ship->updatePhysics();
+        for (auto &o : spaceObjects) {
+            o->updatePhysics(spaceObjects);
+            o->move(timeStep);
+        }
 
-        //Move for time step
-        ship->move(timeStep);
-
-        //Restart step timer
         stepTimer.start();
 
         // Select the color for drawing. It is set to red here.
@@ -76,8 +82,8 @@ int main(int argc, char ** argv)
 
         ship->printDiagnostics(overlay);
 
-        planet->render(renderer);
-        ship->render(renderer);
+        for (auto &o : spaceObjects)
+            o->render(renderer);
 
         overlay->render(renderer);
 

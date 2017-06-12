@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <SDL.h>
 #include "DebugOverlay.hpp"
 
@@ -25,12 +26,16 @@ public:
 
 	void move(float timeStep);
 
-	void updatePhysics(void);
+	void updatePhysics(std::vector<SpaceObject*> &v);
 
 	//Shows the dot on the screen
 	void render(SDL_Renderer * renderer);
 
 	void printDiagnostics(DebugOverlay * overlay);
+
+	float getMass(void);
+
+	SDL_Point getPos(void);
 };
 
 class Spaceship : public SpaceObject {

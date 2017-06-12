@@ -37,11 +37,9 @@ void DebugOverlay::print(const char* fmt, ...) {
 void DebugOverlay::render(SDL_Renderer * renderer) {
 	SDL_Rect Message_rect = {0, 0, 0, 0};
 
-	for (vector<SDL_Surface*>::iterator s = surfaces.begin();
-                              s != surfaces.end();
-                              ++s) {
+	for (auto const& s : surfaces) {
 
-		SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, *s); //now you can convert it into a texture
+		SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, s); //now you can convert it into a texture
 
 		SDL_QueryTexture(Message, NULL, NULL, &Message_rect.w, &Message_rect.h);
 
@@ -49,7 +47,7 @@ void DebugOverlay::render(SDL_Renderer * renderer) {
 
 		Message_rect.y += 24;
 
-		SDL_FreeSurface(*s);
+		SDL_FreeSurface(s);
 		SDL_DestroyTexture(Message);
 	}
 
