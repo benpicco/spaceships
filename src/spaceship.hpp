@@ -9,9 +9,10 @@ protected:
 	float mPosX, mPosY;
 	float mVelX, mVelY;
 	float mAccX, mAccY;
-	float angle;
+	float angle, angle_speed, angle_acc;
 	
 	float force;
+	float force_rot;
 
 	float weight;
 

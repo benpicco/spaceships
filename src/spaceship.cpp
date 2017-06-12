@@ -14,7 +14,11 @@ SpaceObject::SpaceObject(float x, float y, SDL_Texture *texture, float weight) :
     mAccY = 0;
 
     angle = 0;
+    angle_speed = 0;
+    angle_acc = 0;
+
     force = 0;
+    force_rot = 0;
 
     if (!texture)
         printf("can't load texture!\n");
@@ -39,6 +43,8 @@ void SpaceObject::updatePhysics(std::vector<SpaceObject*> &v) {
     mAccX = force * sinf(deg_to_rad(angle)) / weight;
     mAccY = -force * cosf(deg_to_rad(angle)) / weight;
 
+    angle_acc = force_rot / weight;
+
     for (auto &o : v) {
         if (o == this)
             continue;
@@ -56,8 +62,11 @@ void SpaceObject::move(float timeStep) {
     mVelX += mAccX * timeStep;
     mVelY += mAccY * timeStep;
 
-    mPosX += mVelX * timeStep;  
+    mPosX += mVelX * timeStep;
     mPosY += mVelY * timeStep;
+
+    angle_speed += angle_acc * timeStep;
+    angle += angle_speed * timeStep;
 }
 
 void SpaceObject::render(SDL_Renderer * renderer) {
@@ -88,10 +97,7 @@ void Spaceship::handleEvent(SDL_Event& e) {
             if ( e.jaxis.axis == 0) {
 
                 /* Left-right movement code goes here */
-                if (e.jaxis.value < 0)
-                    angle -= 1.f;
-                if (e.jaxis.value > 0)
-                    angle += 1.f;
+                force_rot = 10 * force_max * e.jaxis.value / (float) 0x10000 / 2;
             }
 
             if ( e.jaxis.axis == 1) {
