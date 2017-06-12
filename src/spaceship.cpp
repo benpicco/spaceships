@@ -69,16 +69,16 @@ void SpaceObject::move(float timeStep) {
     angle += angle_speed * timeStep;
 }
 
-void SpaceObject::render(SDL_Renderer * renderer) {
-    SDL_Rect rect = {(int) mPosX - width / 2, (int) mPosY - height / 2, width, height};
+void SpaceObject::render(SDL_Renderer * renderer, SDL_Rect &camera) {
+    SDL_Rect rect = {(int) mPosX - width / 2 - camera.x, (int) mPosY - height / 2 - camera.y, width, height};
     SDL_Point center = {width/2, height/2}; // the center where the texture will be rotated.
 
     SDL_RenderCopyEx(renderer, texture, NULL , &rect, angle, &center, SDL_FLIP_NONE);
 }
 
 void SpaceObject::printDiagnostics(DebugOverlay *overlay) {
-    overlay->print("x: %.2f", mPosX);
-    overlay->print("y: %.2f", mPosY);
+    overlay->print("Vx: %.2f m/s + %.2f m/s^2", mVelX, mAccX);
+    overlay->print("Vy: %.2f m/s + %.2f m/s^2", mVelY, mAccY);
 }
 
 Spaceship::Spaceship(float x, float y, SDL_Texture *texture, float weight, float force_max) : SpaceObject(x, y, texture, weight) {

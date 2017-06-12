@@ -28,7 +28,8 @@ int main(int argc, char ** argv)
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     IMG_Init(IMG_INIT_PNG);
  
-    SDL_Window * window = SDL_CreateWindow("Spaceships", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 768, 0);
+    SDL_Rect camera = {0, 0, 1280, 1024};
+    SDL_Window * window = SDL_CreateWindow("Spaceships", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, camera.w, camera.h, 0);
     SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
     SDL_JoystickEventState(SDL_ENABLE);
@@ -82,8 +83,11 @@ int main(int argc, char ** argv)
 
         ship->printDiagnostics(overlay);
 
+        camera.x = ship->getPos().x - camera.w / 2;
+        camera.y = ship->getPos().y - camera.h / 2;
+
         for (auto &o : spaceObjects)
-            o->render(renderer);
+            o->render(renderer, camera);
 
         overlay->render(renderer);
 

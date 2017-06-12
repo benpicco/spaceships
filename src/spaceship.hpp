@@ -30,7 +30,7 @@ public:
 	void updatePhysics(std::vector<SpaceObject*> &v);
 
 	//Shows the dot on the screen
-	void render(SDL_Renderer * renderer);
+	void render(SDL_Renderer * renderer, SDL_Rect &camera);
 
 	void printDiagnostics(DebugOverlay * overlay);
 
